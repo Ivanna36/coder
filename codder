@@ -1,0 +1,27 @@
+import requests
+
+class CaptchaVerification:
+    def __init__(self, secret_key):
+        self.secret_key = secret_key
+
+    def verify_captcha(self, response_token, remote_ip):
+        url = "https://www.google.com/recaptcha/api/siteverify"
+        payload = {
+            "secret": self.secret_key,
+            "response": response_token,
+            "remoteip": remote_ip
+        }
+        response = requests.post(url, data=payload)
+        if response.status_code == 200:
+            data = response.json()
+            return data.get("success", False)
+        return False
+
+# Пример использования
+captcha = CaptchaVerification(secret_key="ваш_секретный_ключ_от_рекапчи")
+response_token = input("Введите токен reCAPTCHA: ")
+remote_ip = "IP_адрес_пользователя"  # Можно использовать IP-адрес пользователя, отправляющего запрос
+if captcha.verify_captcha(response_token, remote_ip):
+    print("Проверка reCAPTCHA успешна. Пользователь не является роботом.")
+else:
+    print("Ошибка проверки reCAPTCHA. Пользователь не прошел проверку.")
